@@ -25,9 +25,6 @@ class SessionViewModel(private val sessionRepository: SessionRepository) : ViewM
         viewModelScope.launch(Dispatchers.IO) {
             val result = sessionRepository.getSessions()
             sessions.postValue(Resource.Success(result))
-            if(result.isNullOrEmpty()){
-                sessions.postValue(Resource.Error(msg="No data saved "))
-            }
         }
     }
 
@@ -41,6 +38,6 @@ class SessionViewModel(private val sessionRepository: SessionRepository) : ViewM
     }
 
     fun getSessionsLiveData() = sessions as LiveData<Resource<List<Session>>>
-    fun getLastInsertedSessionLiveData() = lastInsertedSessions as SingleLiveEvent<Resource<Session>>
+    fun getLastInsertedSessionLiveData() = lastInsertedSessions
 
 }

@@ -1,9 +1,13 @@
 package com.example.speechnote.ui
 
+
+
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.biometric.BiometricPrompt
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,6 +19,8 @@ import com.example.speechnote.utils.gone
 import com.example.speechnote.utils.show
 import com.example.speechnote.utils.showToast
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.util.concurrent.Executor
+
 
 class SessionFragment : Fragment(R.layout.fragment_sessions), SessionsAdapter.Interaction {
 
@@ -23,6 +29,8 @@ class SessionFragment : Fragment(R.layout.fragment_sessions), SessionsAdapter.In
     private lateinit var binding: FragmentSessionsBinding
 
     private val sessionsAdapter by lazy { SessionsAdapter(this) }
+
+    private lateinit var sessionNavigateItem: Session
 
 
     override fun onCreateView(
@@ -95,10 +103,45 @@ class SessionFragment : Fragment(R.layout.fragment_sessions), SessionsAdapter.In
 
     }
 
+    private fun checkBiometricSupport(){
+        val executor: Executor = ContextCompat.getMainExecutor(requireContext())
+        val biometricPrompt = BiometricPrompt(this, executor,
+            object : BiometricPrompt.AuthenticationCallback() {
+                override fun onAuthenticationError(
+                    errorCode: Int,
+                    errString: CharSequence
+                ) {
+                    super.onAuthenticationError(errorCode, errString)
+                    showToast("Authentication error: $errString")
+                }
+
+                override fun onAuthenticationSucceeded(
+                    result: BiometricPrompt.AuthenticationResult
+                ) {
+                    super.onAuthenticationSucceeded(result)
+                    findNavController().navigate(SessionFragmentDirections.actionSessionFragmentToDetailsFragment(sessionNavigateItem))
+                }
+
+                override fun onAuthenticationFailed() {
+                    super.onAuthenticationFailed()
+                    showToast("Authentication failed")
+                }
+            })
+
+        val promptInfo: BiometricPrompt.PromptInfo = BiometricPrompt.PromptInfo.Builder()
+            .setTitle("Finger print authentication")
+            .setSubtitle("To Enter session authenticate using finger print")
+            .setNegativeButtonText("Cancel")
+            .build()
+
+        biometricPrompt.authenticate(promptInfo)
+    }
+
 
 
     override fun onItemSelected(position: Int, item: Session) {
-        findNavController().navigate(SessionFragmentDirections.actionSessionFragmentToDetailsFragment(item))
+        sessionNavigateItem = item
+        checkBiometricSupport()
     }
 
 
