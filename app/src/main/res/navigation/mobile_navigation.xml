@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@id/sessionFragment">
+
+
+    <fragment
+        android:id="@+id/sessionFragment"
+        android:name="com.example.speechnote.ui.SessionFragment"
+        android:label="SessionFragment" >
+        <action
+            android:id="@+id/action_sessionFragment_to_detailsFragment"
+            app:destination="@id/detailsFragment" />
+    </fragment>
+
+
+    <fragment
+        android:id="@+id/detailsFragment"
+        android:name="com.example.speechnote.ui.DetailsFragment"
+        android:label="DetailsFragment" >
+        <argument android:name="session"
+            app:argType="com.example.speechnote.data.model.Session"/>
+    </fragment>
+
+</navigation>
